@@ -79,14 +79,9 @@ const drawCube = (center, angle = 0) => {
 };
 
 const getAngle = (x, y) => {
-    const startX = y > canvas.clientHeight/2 ? -50 : 50;
+    let angle = 180 / Math.PI * Math.atan2(y - canvas.clientHeight/2, x - canvas.clientWidth/2) * -1;
 
-    const dotProduct = startX * (x - canvas.clientWidth/2);
-    const lv1 = Math.pow(startX, 2);
-    const lv2 = Math.pow(x - canvas.clientWidth/2, 2) + Math.pow(y - canvas.clientHeight/2, 2);
-    let angle = 180 / Math.PI * Math.acos(dotProduct / Math.sqrt(lv1 * lv2));
-
-    //console.log(angle);
+    console.log(angle);
     return angle;
 };
 
@@ -102,23 +97,23 @@ let downAngle = undefined;
 let upAngle = undefined;
 let curAngle = 0;
 canvas.addEventListener('mousedown', event => {
-  const downX = event.offsetX;
-  const downY = event.offsetY;
-  downAngle = getAngle(downX, downY);
+    const downX = event.offsetX;
+    const downY = event.offsetY;
+    downAngle = getAngle(downX, downY);
 });
 canvas.addEventListener('mousemove', event => {
-  if (downAngle !== undefined) {
-      const x = event.offsetX;
-      const y = event.offsetY;
-      upAngle = getAngle(x, y);
-      drawCube(center, curAngle + upAngle - downAngle);
-  }
+    if (downAngle !== undefined) {
+        const x = event.offsetX;
+        const y = event.offsetY;
+        upAngle = getAngle(x, y);
+        drawCube(center, curAngle + upAngle - downAngle);
+    }
 });
 canvas.addEventListener('mouseup', event => {
-  curAngle = upAngle - downAngle;
+    curAngle = upAngle - downAngle;
 
-  downAngle = undefined;
-  upAngle = undefined;
+    downAngle = undefined;
+    upAngle = undefined;
 });
 
 drawCube(center);
