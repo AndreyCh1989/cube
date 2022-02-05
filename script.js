@@ -1,119 +1,178 @@
+class Shape {
+    /**
+     * Shape object
+     * @param nodes {Array.<Node>}
+     * @param center {Center}
+     * @param color {string}
+     * @param ctx
+     */
+    constructor(nodes, center, color = '#000') {
+        this.nodes = nodes;
+        this.center = center;
+        this.color = color;
+        this.shape = undefined;
+        this.angle = 0;
+
+        this.draw();
+    }
+
+    /**
+     * Get position of node based on angle
+     * @param x {int}
+     * @param y {int}
+     * @param angle {int}
+     * @returns {{x: number, y: number}}
+     */
+    getP = (x, y, angle) => {
+        const rads = Math.PI / 180 * angle;
+
+        const result = {
+            x: x * Math.cos(rads) + y * Math.sin(rads),
+            y: -1 * x * Math.sin(rads) + y * Math.cos(rads),
+        };
+        //console.log(angle, rads, result);
+        return result;
+    }
+
+    /**
+     * Get angle based on mouse position
+     * @param x {int}
+     * @param y {int}
+     * @returns {number}
+     */
+    getAngle = (x, y, down = false) => {
+        let angle = 180 / Math.PI * Math.atan2(y - this.center.y, x - this.center.x) * -1;
+        if (down) {
+            angle -= this.angle;
+        }
+
+        //console.log(angle);
+        return angle;
+    };
+
+    /**
+     * Draw shape
+     * @param angle {int}
+     */
+    draw = () => {
+        this.shape = new Path2D();
+        //console.log(this.angle);
+        for (let i = 0; i < this.nodes.length; i++) {
+            const node = this.nodes[i];
+            const p = this.getP(node.x, node.y, this.angle);
+
+            if (i === 0) {
+                this.shape.moveTo(this.center.x + p.x, this.center.y + p.y);
+            } else {
+                this.shape.lineTo(this.center.x + p.x, this.center.y + p.y);
+            }
+        }
+
+        this.shape.closePath();
+    }
+}
+
 class Node {
-    constructor(x, y, z) {
+    /**
+     * Node object
+     * @param x {int}
+     * @param y {int}
+     */
+    constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.z = z;
+    }
+}
+
+class Center {
+    /**
+     * Center object
+     * @param x {int}
+     * @param y {int}
+     */
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
     }
 }
 
 /**
- * Bottom
  * 1------2
  * |      |
  * |      |
- * 3------4
- *
- * Top
- * 5------6
- * |      |
- * |      |
- * 7------8
+ * 4------3
  */
-const cube = [
-    new Node(0, 0,  0),     // 1
-    new Node(50,0,  0),     // 2
-    new Node(0, 50, 0),     // 3
-    new Node(50,50, 0),     // 4
-    new Node(0, 0,  50),    // 5
-    new Node(50,0,  50),    // 6
-    new Node(0, 50, 50),    // 7
-    new Node(50,50, 50),    // 8
-]
-
-const getD = (x, y, angle) => {
-    const rads = Math.PI / 180 * angle;
-
-    const result = {
-        x: x * Math.cos(rads) + y * Math.sin(rads),
-        y: -1 * x * Math.sin(rads) + y * Math.cos(rads),
-    };
-    //console.log(angle, rads, result);
-    return result;
-}
-
-const drawCube = (center, angle = 0) => {
-    const d1 = getD(-60, -60, angle);
-    const d2 = getD(60,-60, angle);
-    const d3 = getD(60, 60, angle);
-    const d4 = getD(-60, 60, angle);
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.beginPath();
-
-    ctx.beginPath();
-    ctx.strokeStyle = '#f00';
-    ctx.moveTo(center.x + d1.x, center.y + d1.y);
-    ctx.lineTo(center.x + d2.x, center.y + d2.y);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.strokeStyle = '#ffd500';
-    ctx.moveTo(center.x + d2.x, center.y + d2.y);
-    ctx.lineTo(center.x + d3.x, center.y + d3.y);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.strokeStyle = '#b300ff';
-    ctx.moveTo(center.x + d3.x, center.y + d3.y);
-    ctx.lineTo(center.x + d4.x, center.y + d4.y);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.strokeStyle = '#00ffb7';
-    ctx.moveTo(center.x + d4.x, center.y + d4.y);
-    ctx.lineTo(center.x + d1.x, center.y + d1.y);
-    ctx.stroke();
-
-    ctx.closePath();
-    ctx.stroke();
-};
-
-const getAngle = (x, y) => {
-    let angle = 180 / Math.PI * Math.atan2(y - canvas.clientHeight/2, x - canvas.clientWidth/2) * -1;
-
-    console.log(angle);
-    return angle;
-};
-
+const CHOICE_STYLE = '#f00';
 const canvas = document.querySelector('#canvas')
 const ctx = canvas.getContext('2d');
 ctx.canvas.width = canvas.clientWidth;
 ctx.canvas.height = canvas.clientHeight;
 
-const center = {x: canvas.clientWidth/2, y: canvas.clientHeight/2};
+const cube = new Shape([
+    new Node(-60,   -60),
+    new Node(60,    -60),
+    new Node(60,    60),
+    new Node(-60,   60)
+], new Center(canvas.clientWidth/2, canvas.clientHeight/2), '#47dc10');
+const cube2 = new Shape([
+    new Node(-60,   -60),
+    new Node(60,    -60),
+    new Node(60,    60),
+    new Node(-60,   60)
+], new Center(canvas.clientWidth - 150, canvas.clientHeight - 150), '#10dcc4');
+
+const figures = [cube, cube2];
+
+const center = new Center(canvas.clientWidth/2, canvas.clientHeight/2);
 ctx.fillStyle = 'green';
 
 let downAngle = undefined;
 let upAngle = undefined;
-let curAngle = 0;
+let rotateFigure = undefined;
 canvas.addEventListener('mousedown', event => {
-    const downX = event.offsetX;
-    const downY = event.offsetY;
-    downAngle = getAngle(downX, downY);
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    figures.forEach((figure) => {
+        const path = figure.shape;
+        if (ctx.isPointInPath(path, x, y)) {
+            rotateFigure = figure;
+            downAngle = figure.getAngle(x, y, true);
+            ctx.fillStyle = CHOICE_STYLE;
+            ctx.fill(path);
+        } else {
+            ctx.fillStyle = figure.color;
+            ctx.fill(path);
+        }
+    });
 });
 canvas.addEventListener('mousemove', event => {
     if (downAngle !== undefined) {
-        const x = event.offsetX;
-        const y = event.offsetY;
-        upAngle = getAngle(x, y);
-        drawCube(center, curAngle + upAngle - downAngle);
+        const x = event.clientX;
+        const y = event.clientY;
+        upAngle = rotateFigure.getAngle(x, y);
+        rotateFigure.angle = upAngle - downAngle;
+        console.log(rotateFigure.angle, upAngle, downAngle);
+        rotateFigure.draw();
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        figures.forEach((figure) => {
+            ctx.fillStyle = figure === rotateFigure ? CHOICE_STYLE : figure.color;
+            ctx.fill(figure.shape);
+        });
     }
 });
 canvas.addEventListener('mouseup', event => {
-    curAngle = upAngle - downAngle;
-
+    rotateFigure = undefined;
     downAngle = undefined;
     upAngle = undefined;
 });
 
-drawCube(center);
+figures.forEach(figure => {
+    ctx.fillStyle = figure.color;
+    ctx.fill(figure.shape);
+});
