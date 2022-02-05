@@ -119,7 +119,7 @@ const cube2 = new Shape([
     new Node(60,    -60),
     new Node(60,    60),
     new Node(-60,   60)
-], new Center(canvas.clientWidth - 150, canvas.clientHeight - 150), '#10dcc4');
+], new Center(canvas.clientWidth - 150, canvas.clientHeight - 150), '#102bdc');
 
 const figures = [cube, cube2];
 
