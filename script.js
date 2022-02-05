@@ -155,7 +155,7 @@ canvas.addEventListener('mousemove', event => {
         const y = event.clientY;
         upAngle = rotateFigure.getAngle(x, y);
         rotateFigure.angle = upAngle - downAngle;
-        console.log(rotateFigure.angle, upAngle, downAngle);
+        //console.log(rotateFigure.angle, upAngle, downAngle);
         rotateFigure.draw();
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
